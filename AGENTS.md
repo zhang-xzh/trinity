@@ -6,7 +6,7 @@
 - `crates/eve-proto`：LLV 版本握手、machoNet 帧、包与地址。
 - `crates/eve-server`：服务端本体（连接/服务/ballpark/bots/web）。
 
-客户端按 `M:\EVE-LOCAL\inputs\EVE-Online-45017` 处理（启动器 `eve.exe`，真正的游戏进程是 `bin\exefile.exe`；**永不升级**）；客户端代码仓库按 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code` 处理。两者暂未实际就绪，路径先按约定预留，就绪后先核对再改本文。游戏端口 **26000**，web 面板 **8080**，Postgres **5432**。远端 `origin` = `github.com/zhang-xzh/trinity`。
+客户端在 `M:\EVE-LOCAL\inputs\EVE-Online-45017`（4.10 / build 45017；启动器 `eve.exe`，真正的游戏进程是 `bin\ExeFile.exe`；**永不升级**）；客户端代码基线仓库在 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（`main` 基线 / `plus` 开发）。游戏端口 **26000**，web 面板 **8080**，Postgres **5432**。远端 `origin` = `github.com/zhang-xzh/trinity`。
 
 本文件对本工作区内全部开发强制生效；详细操作（worktree 命令、数据卷操作、异常模板、skill 规范）见 `AGENTS-DETAIL.md`，只在执行对应任务时读取。
 
@@ -84,7 +84,7 @@ git 对分支引用加锁、更新原子，**不存在真正的同时合并**：
 
 - 存在“零售原状”与“自造/近似/占位”两种做法时，**无条件采用零售原状**。
 - 零售权威来源只认这几处：
-  - 客户端代码与数据：`M:\EVE-LOCAL\inputs\EVE-Online-45017`（客户端就绪后核对目录与代码包）。
+  - 客户端代码与数据：`M:\EVE-LOCAL\inputs\EVE-Online-45017`；解包基线与其工具在 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`。
   - 数据库：`db/*.sql.gz`（228 个官方表转储），客户端协议与字段以表结构为准。
   - 客户端行为：`eve.exe` 自带逻辑与 `capture\Gamelogs`、`capture\Chatlogs` 的实际输出；服务端代码里由反汇编得来的格式注释（如 `crates/eve-server/src/destiny.rs`、`ballpark.rs`）即是这条线的产物。
 - 自造内容仅作临时缺口填补，且须在确认零售无对应后才可用，并在文档中写明缺口与获取途径；不得臆造冒充零售。
@@ -139,13 +139,16 @@ git 对分支引用加锁、更新原子，**不存在真正的同时合并**：
 
 # 客户端代码修改（强制）
 
-**客户端代码、工具、补丁、本地化流水线与产物全部在独立仓库 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`，不在本服务器仓库。客户端与代码仓库尚未实际就绪；就绪后先核对目录、代码包格式与工具链，再按实际改写本文与 skill `trinity-client-code`。**
+**客户端代码、工具、补丁、本地化流水线与产物全部在独立仓库 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`，不在本服务器仓库。**
 
 - 客户端固定为 build 45017，永不升级；补丁只针对这一固定版本，不写版本探测、不做跨版本兼容。
 - 客户端代码仓库采用与 3913 相同的双分支策略：`main` = 零售基线（只对照与重置），`plus` = 开发主线；每个任务用独立 worktree 与 `Local patch: <英文简述>` 提交。
-- 改动流程：备份当前代码包 → 从零售基线重新生成 → 脚本改写并校验 → 覆盖客户端代码包 → **完全退出并重启客户端** → 记录到 `doc/client/`。
-- 只改显示文本/本地化；类名、字典键、import 名、比较常量、单 token 标识符不改。`bin\exefile.exe`、`bin\*.dll`、`res\*.stuff` 一律不改。
-- 客户端代码容器/字节码格式以实际客户端为准；核对前不得拿 3913 的 `compiled.code` 工具直接改写。
+- 已落地基线：`dist/compiled.code`（436 模块）+ `dist/lib.ccp`（23）+ `dist/stdlib.ccp`（226），共 685 个模块；`tree/`、`lib/`、`stdlib/` 下是 `.pyc`（权威）+ `.py`（uncompyle6 阅读稿）。基线提交 `b74ecc1`，`plus` 已建。
+- 45017 的容器格式：`script/compiled.code` 是 protocol-2 pickle 的分区字典；`lib/*.ccp` 是 ZIP + `.pyj`。两类载荷都是 **RC4(zlib(...))**：`compiled.code` 内层是 marshal code object，`.pyj` 内层是 8 字节 pyc 头 + marshal；RC4 16 字节密钥在 `bin/blue.dll` 的 SIMPLEBLOB 里（`blob[12:28]` 反转）。
+- 工具：`tools/extract_compiled_code.py`（解包/反编译/manifest）、`tools/verify_manifest.py`（校验）。**重打包/签名工具尚未实现**；在它落地前，不要声称已能改写并回写 `compiled.code`。
+- 改动流程（重打包工具就绪后）：备份当前代码包 → 从零售基线重新生成 → 脚本改写并校验 → 覆盖客户端代码包 → **完全退出并重启客户端** → 记录到 `doc/client/`。
+- 只改显示文本/本地化；类名、字典键、import 名、比较常量、单 token 标识符不改。`bin\ExeFile.exe`、`bin\*.dll`、`res\*.stuff` 一律不改。
+- 不得混用 3913 的 `compiled.code` 工具或现代客户端（3396210）的 `.fsdbinary`/`code.ccp` 经验。
 
 ---
 

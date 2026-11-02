@@ -25,7 +25,7 @@ docker compose down
 
 先决条件：端口 26000/8080/5432 未被占用（EveJS / RMR 等服务若在跑，先停对应容器）。
 
-`docker-compose.yml` 固定项目名 `trinity`，所有 checkout 共用同一组容器，所以从 worktree 运行会用该 worktree 的代码重建 `trinity-server`；日常仍在主工作区 `M:\EVE-LOCAL\trinity` 运行。客户端就绪后，等 26000 就绪再手动启动 `M:\EVE-LOCAL\inputs\EVE-Online-45017\eve.exe`。
+`docker-compose.yml` 固定项目名 `trinity`，所有 checkout 共用同一组容器，所以从 worktree 运行会用该 worktree 的代码重建 `trinity-server`；日常仍在主工作区 `M:\EVE-LOCAL\trinity` 运行。等 26000 就绪后手动启动 `M:\EVE-LOCAL\inputs\EVE-Online-45017\eve.exe`。
 
 ## 本地构建（不走 Docker）
 
@@ -82,7 +82,7 @@ docker compose exec postgres psql -U trinity -d trinity -c "SELECT count(*) FROM
 
 - 启动日志会打印字符串表条目数、账号数、bulk 数据规模、services 数量等；`debug` 级别逐条打印 service 调用。
 - 无法解码的帧落到 `RMR_DUMP_DIR`（容器 `/app/logs/dumps`，`docker cp trinity-server:/app/logs/dumps .` 取出）。
-- 客户端侧证据（就绪后）：`M:\EVE-LOCAL\inputs\EVE-Online-45017\capture\Gamelogs`（游戏事件）与 `capture\Chatlogs`。
+- 客户端侧证据：`M:\EVE-LOCAL\inputs\EVE-Online-45017\capture\Gamelogs`（游戏事件）与 `capture\Chatlogs`。
 
 ## 验证清单（改动后）
 
