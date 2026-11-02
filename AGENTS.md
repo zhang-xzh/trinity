@@ -6,7 +6,7 @@
 - `crates/eve-proto`：LLV 版本握手、machoNet 帧、包与地址。
 - `crates/eve-server`：服务端本体（连接/服务/ballpark/bots/web）。
 
-客户端在 `M:\EVE-LOCAL\inputs\EVE-Online-45017`（4.10 / build 45017；启动器 `eve.exe`，真正的游戏进程是 `bin\ExeFile.exe`；**永不升级**）；客户端代码基线仓库在 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（`main` 基线 / `plus` 开发）。游戏端口 **26000**，web 面板 **8080**，Postgres **5432**。远端 `origin` = `github.com/zhang-xzh/trinity`。
+客户端在 `M:\EVE-LOCAL\inputs\EVE-Online-45017`（4.10 / build 45017；启动器 `eve.exe`，真正的游戏进程是 `bin\ExeFile.exe`；**永不升级**）；客户端代码基线仓库在 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（`main` 基线 / `plus` 开发）。游戏端口 **26000**，web 面板 **8080**，Postgres **5432**。远端 `origin` = `github.com/zhang-xzh/trinity`（个人镜像），`upstream` = `github.com/pixelcatburglar/trinity`（上游基线）。
 
 本文件对本工作区内全部开发强制生效；详细操作（worktree 命令、数据卷操作、异常模板、skill 规范）见 `AGENTS-DETAIL.md`，只在执行对应任务时读取。
 
@@ -14,25 +14,25 @@
 
 # 每任务独立 worktree（强制且唯一）
 
-**开发主分支当前是 `main`。每个任务从新分支开始，完成后合并回 `main`；禁止直接在 `main` 上开发。任务开工一律用独立 git worktree 检出任务分支——worktree 是唯一开工方式，全面禁止在主工作区或任何主 checkout 里直接 `git checkout -b` / `git switch -c` 创建分支。**
+**开发主线是 `plus`。每个任务从新分支开始，完成后合并回 `plus`；禁止直接在 `plus` 上开发。任务开工一律用独立 git worktree 检出任务分支——worktree 是唯一开工方式，全面禁止在主工作区或任何主 checkout 里直接 `git checkout -b` / `git switch -c` 创建分支。**
 
-- 当前长期分支：
-  - `main` = 开发主分支（任务分支合入目标），主工作区 `M:\EVE-LOCAL\trinity` 固定检出它。
-  - 仓库目前没有 `plus`/上游基线双分支结构；日后若建立 `plus`，则 `plus` 转为开发主线、`main` 转为零售/上游基线，规则同步更新。
+- 两条长期分支：
+  - `plus` = 开发主线（任务分支合入目标），主工作区 `M:\EVE-LOCAL\trinity` 固定检出它。
+  - `main` = 上游基线（`upstream/main`，即 `pixelcatburglar/trinity` 的 `Initial Trinity Work`），只作对照与重置来源；**永不直接提交、永不接受任务分支合入**。
 - **开工（唯一方式）**：
-  1. `git fetch`（有远端时）→ 主工作区 `git checkout main` → `git pull`（有远端时）。
-  2. `git worktree add -b <前缀>/<功能>-$env:OPENCODE_SESSION_ID M:\EVE-LOCAL\worktrees\wt-trinity-<功能> main`。
+  1. `git fetch --all`（有远端时）→ 主工作区 `git checkout plus` → `git pull`（有远端时）。
+  2. `git worktree add -b <前缀>/<功能>-$env:OPENCODE_SESSION_ID M:\EVE-LOCAL\worktrees\wt-trinity-<功能> plus`。
   3. 之后所有开发都在该 worktree 目录内进行（session `workdir` 指向它）。
-- **禁止事项**：不得用 `git checkout -b` / `git switch -c` 在已有目录里建分支；不得在主工作区改动文件做任务；不得为开工在已有 checkout 内切分支。
+- **禁止事项**：不得用 `git checkout -b` / `git switch -c` 在已有目录里建分支；不得在主工作区改动文件做任务；不得为开工在已有 checkout 内切分支。主工作区固定保留给 `plus`（或只读/规划），只用于同步 `plus` 与执行合并。
 - 命名：`<前缀>/<功能>-<sessionid>`；前缀 `feat/`、`fix/`、`doc/`、`chore/`；`<功能>` 简短英文；`sessionid` 取当前对话 id（本地插件 `.opencode/plugins/session-id.js` 注入环境变量 `$OPENCODE_SESSION_ID`）。
 - 分支只承载本任务改动；同一任务多步改动留在同一分支、同一 worktree。
-- 完成后：worktree 内提交干净（无未提交内容）→ 回主工作区 `git checkout main` → 同步 `main` → `git merge --no-ff <分支>` → 解冲突并提交。**合并后保留分支、不删除**；只 `git worktree remove` 清理目录。
-- 合前若 `main` 已前进，先把分支 rebase/merge 到最新 `main`。
+- 完成后：worktree 内提交干净（无未提交内容）→ 回主工作区 `git checkout plus` → 同步 `plus` → `git merge --no-ff <分支>` → 解冲突并提交。**合并后保留分支、不删除**；只 `git worktree remove` 清理目录。
+- 合前若 `plus` 已前进，先把分支 rebase/merge 到最新 `plus`。
 - 禁止带未提交改动切分支；禁止跨任务复用同一分支；禁止同一分支被两个 worktree 同时检出。
 
 ## 并发合并（多对话同时开工）
 
-git 对分支引用加锁、更新原子，**不存在真正的同时合并**：同一目标分支的并发合并只有一个成功，其余会报 `cannot lock ref` / non-fast-forward，须 `git fetch` 后重试。多对话并行按**串行合并**处理：每次都走「同步 `main` → rebase/merge 最新 `main` → 合并 → 提交」的完整循环。同文件同区域是文本冲突（人工解），不同区域可能是语义冲突（git 不提示，自行验证）。
+git 对分支引用加锁、更新原子，**不存在真正的同时合并**：同一目标分支的并发合并只有一个成功，其余会报 `cannot lock ref` / non-fast-forward，须 `git fetch` 后重试。多对话并行按**串行合并**处理：每次都走「同步 `plus` → rebase/merge 最新 `plus` → 合并 → 提交」的完整循环。同文件同区域是文本冲突（人工解），不同区域可能是语义冲突（git 不提示，自行验证）。
 
 ## worktree 不隔离的部分
 
