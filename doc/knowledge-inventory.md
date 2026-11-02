@@ -5,9 +5,9 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 ## 环境事实
 
 - 服务端：`M:\EVE-LOCAL\trinity`（Rust workspace；镜像/容器 `trinity-server`，Postgres 容器 `trinity-postgres`；端口 26000 / 8080 / 5432）。
-- 客户端：`M:\EVE-LOCAL\inputs\EVE-Online-45017`（EVE Trinity 4.10 / build 45017，`eve.exe`，永不升级）。客户端目录已就位（`bin\ExeFile.exe`、`script\compiled.code`、`res*.stuff`），容器格式见 `doc/client/version-lineage-3913-45017-3396210.md`。
-- 客户端代码仓库：`M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（独立 git 仓库；目录尚未创建）。
-- 启动：当前没有 `Play.bat`；`docker compose up -d` 起服务端，客户端就绪后手动启动 `eve.exe`。
+- 客户端：`M:\EVE-LOCAL\inputs\EVE-Online-45017`（EVE Trinity 4.10 / build 45017，`eve.exe` / `bin\ExeFile.exe`，永不升级）；容器格式见 `doc/client/version-lineage-3913-45017-3396210.md`。
+- 客户端代码基线：`M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（独立 git 仓库；`main` = 零售基线提交 `b74ecc1`，`plus` = 开发主线；685 个模块，3 个反编译失败；重打包/签名工具待实现）。
+- 启动：当前没有 `Play.bat`；`docker compose up -d` 起服务端，随后手动启动客户端 `eve.exe`。
 - 远端：`origin` = `github.com/zhang-xzh/trinity`；当前只有长期分支 `main`（没有 `plus`/上游基线双分支）。
 - 数据库：PostgreSQL 16，命名卷 `trinity_pgdata`（compose 项目名 `trinity`），初始化数据 `db/*.sql.gz`（228 个表转储）。
 - 技能目录：`M:\EVE-LOCAL\trinity\.opencode\skills\`（纳入 git）。
@@ -19,7 +19,7 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 |---|---|
 | `agent-context-efficient-reads` | 大文件/大输出/多步骤时的上下文压缩与少往返策略 |
 | `trinity-server-operations` | 构建、启动、配置（`trinity.yml`）、日志、数据库与 `fakeclient` 联调 |
-| `trinity-client-code` | 45017 客户端代码仓库、改写流程与本地化边界（客户端就绪后核对） |
+| `trinity-client-code` | 45017 `.ccp`/`.pyj` 容器、RC4 解密、基线仓库与改写边界 |
 | `eve-online-university-wiki` | 查 EVE 玩法/机制（现代资料，取值仍需回到 45017 客户端） |
 
 ## 仓库文档
@@ -29,7 +29,7 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 | `doc/setup/` | 运行、构建、配置、启动、agent 规则迁移记录 |
 | `doc/platform/` | crate 划分、连接与服务、世界状态、ballpark/destiny、bots、web |
 | `doc/data/` | PostgreSQL 表转储、卷操作、备份/重置、版本溯源 |
-| `doc/client/` | 45017 客户端目录、代码仓库、本地化（待补全） |
+| `doc/client/` | 45017 客户端目录、代码基线仓库、容器格式与本地化 |
 | `doc/issues/` | 已解决异常归档与索引 |
 
 ## 文档清单
@@ -40,7 +40,7 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 | `doc/setup/agent-rules.md` | 本仓库 agent 规则（AGENTS.md/.opencode/skills/doc 约定）的来源、适配与生效方式 |
 | `doc/platform/architecture.md` | 服务端架构总览（crate、模块、数据流） |
 | `doc/data/database.md` | 数据库结构、初始化、备份、重置 |
-| `doc/client/client-45017.md` | 45017 客户端与代码仓库的约定路径、待核对项、改写边界 |
+| `doc/client/client-45017.md` | 45017 客户端与代码基线：路径、容器、哈希、分支、工具与改写边界 |
 | `doc/client/version-lineage-3913-45017-3396210.md` | 3913/45017/3396210 三代客户端技术对比与 45017 的中间态定位 |
 | `doc/issues/INDEX.md` | 异常归档索引 |
 

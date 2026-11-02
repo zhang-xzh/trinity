@@ -67,7 +67,7 @@ cargo run -p eve-server --bin fakeclient -- 127.0.0.1:26000 testuser testpass --
 2. `docker compose logs server --tail 100`：`cannot reach PostgreSQL`、`string table`、`panic`。
 3. 端口是否被占：`Get-NetTCPConnection -LocalPort 26000 -ErrorAction SilentlyContinue`。
 4. 无法解码的帧在 `RMR_DUMP_DIR`（容器 `/app/logs/dumps`），`docker cp trinity-server:/app/logs/dumps .` 取出。
-5. 客户端侧证据：`M:\EVE-LOCAL\inputs\EVE-Online-45017\capture\Gamelogs`（客户端就绪后）。
+5. 客户端侧证据：`M:\EVE-LOCAL\inputs\EVE-Online-45017\capture\Gamelogs`。
 
 ## 禁止事项
 

@@ -41,15 +41,17 @@
 - `git worktree list` 应列出主工作区 + 各对话 worktree，且每个 worktree 的分支互不相同。
 - 在各 worktree 内 `git branch --show-current` 应返回各自的任务分支。
 
-## 客户端代码仓库（就绪后）
+## 客户端代码仓库
 
-- 按约定，45017 客户端代码的逐模块基线在独立 git 仓库 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`；本仓库不保存客户端代码、工具与本地化流水线。
-- 目标布局（与 3913 客户端仓库同一套策略，具体格式待客户端就绪后核对）：
-  - `tree\` = 解包出的客户端代码，权威且字节精确。
-  - `patches\` = 改写脚本/安装器。
-  - `dist\` = 打好的原始包；`main` = 零售基线，`plus` = 开发主线。
-- 建仓库前的大改一律先手工备份当前客户端代码包。
-- worktree 命令（仓库建成后）：
+- 45017 客户端代码的逐模块基线在独立 git 仓库 `M:\EVE-LOCAL\inputs\EVE-Online-45017-code`；本仓库不保存客户端代码、工具与本地化流水线。
+- 当前布局：
+  - `dist\` = `compiled.code`、`lib.ccp`、`stdlib.ccp` 原件 + `manifest.json` + `decompile_failures.txt`。
+  - `tree\` = `compiled.code` 的 436 个模块（`.pyc` 权威 + `.py` 阅读稿）。
+  - `lib\` / `stdlib\` = 23 / 226 个 `.ccp` 模块（`.pyc` + `.py`）。
+  - `tools\` = `extract_compiled_code.py`、`verify_manifest.py`；重打包/签名工具尚未实现。
+- 分支：`main` = 零售基线（提交 `b74ecc1`），`plus` = 开发主线（当前检出）；远程 `gogs` 已配置但尚未推送。
+- 建仓库前/大改前一律先手工备份当前客户端代码包。
+- worktree 命令：
 
   ```powershell
   git -C M:\EVE-LOCAL\inputs\EVE-Online-45017-code worktree add -b <前缀>/<功能>-$env:OPENCODE_SESSION_ID M:\EVE-LOCAL\worktrees\wt-client-<功能> plus
@@ -80,7 +82,7 @@ Docker Desktop 的命名卷不在宿主机路径上，宿主机工具不能按�
   ```
 
 - 服务端自身还会在 `RMR_DUMP_DIR`（容器内 `/app/logs/dumps`）落无法解码的帧，用于排查协议问题。
-- 当前没有 `Play.bat`；启动/停止直接用 `docker compose`。客户端就绪后可另加启动脚本，并同步本文与 `doc/setup/server-operations.md`。
+- 当前没有 `Play.bat`；启动/停止直接用 `docker compose`。客户端已就位，可另加启动脚本，并同步本文与 `doc/setup/server-operations.md`。
 
 ## 异常归档正文模板（doc/issues/<name>.md 必填小节）
 

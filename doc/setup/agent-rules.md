@@ -32,7 +32,7 @@
 
 | 来源规则 | Trinity 对应 |
 |---|---|
-| RMR 客户端 build 3913、`script\compiled.code` | Trinity 客户端 build 45017、`M:\EVE-LOCAL\inputs\EVE-Online-45017`（代码包格式待核对） |
+| RMR 客户端 build 3913、`script\compiled.code` | Trinity 客户端 build 45017、`M:\EVE-LOCAL\inputs\EVE-Online-45017`（已解包：pickle v2 + RC4 + zlib + Python 2.5） |
 | RMR `plus` 开发主线 / `main` 上游基线 | Trinity 当前只有 `main`，先作开发主线；日后建 `plus` 再切换双分支 |
 | RMR 容器 `rmr-postgres`/`rmr-server`、卷 `pgdata` | Trinity 容器 `trinity-postgres`/`trinity-server`、卷 `trinity_pgdata` |
 | RMR 配置 `rmr.yml` | Trinity 配置 `trinity.yml`（compose 内 `RMR_CONFIG=/app/trinity.yml`；裸 `cargo run` 默认仍读 `rmr.yml`） |
@@ -43,9 +43,9 @@
 ## 未导入的内容
 
 - **RMR `doc/platform/implementation-*.md`（7 篇逐模块实现手册）**：写的是 RMR 3913 代码，Trinity 多出 `jumps`/`scan`/`lp`/`outposts`/`corphangar`/`trinity` 等服务，行号也已漂移；未复制，避免过期文档冒充当前状态。需要时按 Trinity 代码另写。
-- **RMR `doc/client/*`、`doc/data/provenance-3913.md`、`doc/client-localization-3913.md`**：绑定 3913 客户端与本地化产物，45017 就绪后按实际重建。
+- **RMR `doc/client/*`、`doc/data/provenance-3913.md`、`doc/client-localization-3913.md`**：绑定 3913 客户端与本地化产物；45017 已按实际重建为 `doc/client/client-45017.md` 与代码基线仓库。
 - **EveJS 专属 skill**（elysian importer、external mod merge、fsd-dogma-editor、gm-menu、gridcheck、server-debugging 等）：绑定 JS 服务端、现代 FSD/SDE 或 `code.ccp`，不适用于 Rust 老客户端服务端。
-- **`eve-online-everef` / `eve-online-resfiles`**：面向现代 EVE 数据集与 `.fsdbinary`/`code.ccp`；45017 客户端未核对前不引入，避免被当成取值依据。
+- **`eve-online-everef` / `eve-online-resfiles`**：面向现代 EVE 数据集与 `.fsdbinary`/`code.ccp`；45017 已核对，但仍不引入，避免现代数值被当成 45017 的取值依据。
 - **EveJS `opencode.json` 的 gridcheck MCP**：Trinity 无对应工具；验证用 `fakeclient`。
 
 ## 生效方式
@@ -68,6 +68,8 @@
 
 ## 已知缺口
 
-- 客户端与客户端代码仓库尚未实际就绪；`AGENTS.md` 与 `trinity-client-code` 里的路径、代码包格式、工具链按约定预留，就绪后先核对再补文档。
+- 客户端代码基线已落地（685 个模块），但**重打包/签名工具尚未实现**；当前只能解包、阅读与改脚本/文档，不能回写 `compiled.code`。
+- 反编译有 3 个 `SourceWalkerError`；权威产物以 `.pyc` 为准。
+- `platform/` 仍只有架构总览；逐模块实现手册待按 Trinity 代码补写。
 - 文档只有 `doc/` 一个入口（权威、当前状态）；`platform/` 目前只有架构总览，逐模块手册待按 Trinity 代码补写。
 - 迁移未引入任何 MCP 服务；需要无头测试时直接用 `fakeclient`。
