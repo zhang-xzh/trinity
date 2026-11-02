@@ -31,6 +31,24 @@
   `boot.ini`/prefs 的 `server` 或 `/server:` 参数决定，`Play.bat` 传 `127.0.0.1`
   即显示本地服务器。
 
+## 加密包与本地登录补丁
+
+服务端只实现 `cryptoPack=Placebo` 握手（`crates/eve-proto/src/handshake.rs`）。
+零售客户端出厂是 `cryptoPack=CryptoAPI`，会以 `HANDSHAKE_INCOMPATIBLEPUBLICKEY`
+被拒（登录界面显示 Incompatible (Public Key)）；CryptoAPI 需要 CCP 私钥，服务端无法实现。
+本地客户端因此固定改为 Placebo，并打 `bin\blue.dll` 补丁跳过 `manifest.dat`
+的单文件 RSA 签名校验（`manifest.dat` 不能重签，私钥 `GoldenCD.pikl` 未发布）。
+
+- 补丁工具与原理：客户端代码仓库
+  `M:\EVE-LOCAL\inputs\EVE-Online-45017-code\tools\patch_blue_dll.py` 与
+  同仓库 `README.md`「本地登录补丁（Placebo 握手）」。
+- 当前生效：`common.ini` 为 `cryptoPack=Placebo`；`bin\blue.dll` 偏移 `0x25CA0`
+  的分支改为恒跳（sha256 `51e58b72…`）；两个 `.retail.bak` 在文件旁。
+- 换客户端目录或恢复零售 `blue.dll` 后需重跑
+  `python tools\patch_blue_dll.py patch`，然后完全重启客户端。
+- 详细故障记录见
+  [`../issues/trinity-issue-handshake-incompatible-public-key.md`](../issues/trinity-issue-handshake-incompatible-public-key.md)。
+
 ## 代码基线
 
 | 来源 | 大小 | sha256 | 模块数 |
@@ -75,7 +93,8 @@
 - 重打包落地后的流程：从零售基线重新生成 → 校验 → 覆盖客户端代码包（先备份）→
   **完全退出并重启客户端** → 证据看 `capture\Gamelogs`。
 - 只改显示文本/本地化；不改类名、字典键、import 名、比较常量、单 token 标识符。
-  `bin\ExeFile.exe`、`bin\*.dll`、`res*.stuff` 一律不改。
+  代码包改写不动 `bin\ExeFile.exe`、`bin\*.dll`、`res*.stuff`；唯一例外是上面
+  「加密包与本地登录补丁」的 `bin\blue.dll` Placebo 补丁（固定偏移、有备份与回滚）。
 - 不得混用 3913 的 `compiled.code` 工具或现代 3396210 的 `.fsdbinary`/`code.ccp` 经验。
 
 规则本体见 `AGENTS.md`「客户端代码修改」；操作细节见 skill `trinity-client-code`。

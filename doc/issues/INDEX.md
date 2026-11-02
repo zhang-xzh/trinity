@@ -4,4 +4,4 @@
 
 | 文档 | 症状 / 触发词 |
 |---|---|
-| （暂无） | — |
+| [`trinity-issue-handshake-incompatible-public-key.md`](trinity-issue-handshake-incompatible-public-key.md) | 登录弹 CONNECTION FAILED / Incompatible (Public Key)；服务端日志 `client offered crypto key`、`HANDSHAKE_INCOMPATIBLEPUBLICKEY`；改 `common.ini` 后报 `Verification failed ... crc ... expected`（cryptoPack / CryptoAPI / Placebo / manifest.dat / blue.dll） |
