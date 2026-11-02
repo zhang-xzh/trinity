@@ -8,7 +8,7 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 - 客户端：`M:\EVE-LOCAL\inputs\EVE-Online-45017`（EVE Trinity 4.10 / build 45017，`eve.exe` / `bin\ExeFile.exe`，永不升级）；容器格式见 `doc/client/version-lineage-3913-45017-3396210.md`。
 - 客户端代码基线：`M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（独立 git 仓库；`main` = 零售基线提交 `b74ecc1`，`plus` = 开发主线；685 个模块，3 个反编译失败；重打包/签名工具待实现）。
 - 启动：仓库根 `Play.bat` 一键起 compose、等 26000，再用 `bin\ExeFile.exe /server:127.0.0.1 /port:26000` 拉起客户端；`Play.bat --no-client` 只起服务端。
-- 远端：`origin` = `github.com/zhang-xzh/trinity`；当前只有长期分支 `main`（没有 `plus`/上游基线双分支）。
+- 远端：`origin` = `github.com/zhang-xzh/trinity`（个人镜像），`upstream` = `github.com/pixelcatburglar/trinity`（上游基线）；长期分支 `plus` = 开发主线（主工作区固定检出），`main` = 上游基线（跟踪 `upstream/main`，只对照与重置，不提交、不接合并）。
 - 数据库：PostgreSQL 16，命名卷 `trinity_pgdata`（compose 项目名 `trinity`），初始化数据 `db/*.sql.gz`（228 个表转储）。
 - 技能目录：`M:\EVE-LOCAL\trinity\.opencode\skills\`（纳入 git）。
 - 仓库文档：`M:\EVE-LOCAL\trinity\doc\`（按领域分目录，见下）。

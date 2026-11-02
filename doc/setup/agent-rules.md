@@ -33,7 +33,7 @@
 | 来源规则 | Trinity 对应 |
 |---|---|
 | RMR 客户端 build 3913、`script\compiled.code` | Trinity 客户端 build 45017、`M:\EVE-LOCAL\inputs\EVE-Online-45017`（已解包：pickle v2 + RC4 + zlib + Python 2.5） |
-| RMR `plus` 开发主线 / `main` 上游基线 | Trinity 当前只有 `main`，先作开发主线；日后建 `plus` 再切换双分支 |
+| RMR `plus` 开发主线 / `main` 上游基线 | 一致：`plus` = 开发主线（任务分支合入目标，主工作区固定检出）；`main` = 上游基线（跟踪 `upstream/main` = `pixelcatburglar/trinity`），只对照与重置 |
 | RMR 容器 `rmr-postgres`/`rmr-server`、卷 `pgdata` | Trinity 容器 `trinity-postgres`/`trinity-server`、卷 `trinity_pgdata` |
 | RMR 配置 `rmr.yml` | Trinity 配置 `trinity.yml`（compose 内 `RMR_CONFIG=/app/trinity.yml`；裸 `cargo run` 默认仍读 `rmr.yml`） |
 | RMR `db/*.sql.gz` 212 个文件 | Trinity `db/*.sql.gz` 228 个文件 |

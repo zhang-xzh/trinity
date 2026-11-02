@@ -6,15 +6,17 @@
 
 ## 如何创建与使用
 
-- 先同步 `main`，再以它为起点建 worktree 并检出任务分支：
+- 先同步 `plus`（开发主线），再以它为起点建 worktree 并检出任务分支：
 
   ```powershell
   cd M:\EVE-LOCAL\trinity
-  git fetch                       # 有远端时
-  git checkout main
+  git fetch --all                 # 有远端时
+  git checkout plus
   git pull                        # 有远端时
-  git worktree add -b <前缀>/<功能>-$env:OPENCODE_SESSION_ID M:\EVE-LOCAL\worktrees\wt-trinity-<功能> main
+  git worktree add -b <前缀>/<功能>-$env:OPENCODE_SESSION_ID M:\EVE-LOCAL\worktrees\wt-trinity-<功能> plus
   ```
+
+- 两条长期分支：`plus` = 开发主线（唯一合入目标）；`main` = 上游基线（跟踪 `upstream/main`，即 `pixelcatburglar/trinity`），只作对照与重置来源，永不提交、永不接合并。要从上游更新基线：`git checkout main; git pull; git checkout plus`。
 
 - worktree 目录一律放在**仓库之外**（`M:\EVE-LOCAL\worktrees\`），不得放进仓库内，否则会成为仓库里的未跟踪文件。
 - 每个对话的 opencode 会话以其 worktree 路径为 `workdir`；所有 git 命令在各自 worktree 内执行。
@@ -22,7 +24,7 @@
 
 ## 并发合并
 
-- 合并仍在主工作区进行：切回 `main` → 同步 → `git merge --no-ff <任务分支>`；按上文“串行合并”循环处理，不要假设自己的分支基线仍是最新。
+- 合并仍在主工作区进行：切回 `plus` → 同步 → `git merge --no-ff <任务分支>`；按上文“串行合并”循环处理，不要假设自己的分支基线仍是最新。
 - 收尾清理（该分支已合并、worktree 干净后）——**只删 worktree 目录，分支保留**：
 
   ```powershell
