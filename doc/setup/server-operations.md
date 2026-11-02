@@ -10,12 +10,16 @@ Trinity 服务端如何构建、启动、配置和观察。所有命令在仓库
 | `postgres` | `postgres:16-alpine`，容器 `trinity-postgres`，库/用户/密码均 `trinity`，卷 `trinity_pgdata` |
 | `fakeclient` | 无头客户端二进制（同 crate 的 `bin/fakeclient.rs`），用于握手与 service 调用验证 |
 
-当前仓库没有 `Play.bat`。
-
 ## 启动
 
 ```powershell
-# 起 postgres + server
+# 推荐：起 compose、等 26000 就绪，再拉起 45017 客户端（仓库根，已跟踪）
+M:\EVE-LOCAL\trinity\Play.bat
+
+# 只起服务端（不拉客户端）
+M:\EVE-LOCAL\trinity\Play.bat --no-client
+
+# 手动
 docker compose up -d
 docker compose logs -f server --tail 100
 
@@ -23,9 +27,15 @@ docker compose logs -f server --tail 100
 docker compose down
 ```
 
-先决条件：端口 26000/8080/5432 未被占用（EveJS / RMR 等服务若在跑，先停对应容器）。
+`Play.bat` 以脚本所在目录为 compose 目录（`%~dp0`）：先 `docker compose up -d`，再轮询 `127.0.0.1:26000`（最多 10 分钟，首次启动要导入数据库），就绪后用 `bin\ExeFile.exe /server:127.0.0.1 /port:26000` 启动客户端。客户端目录默认 `M:\EVE-LOCAL\inputs\EVE-Online-45017`，可用环境变量 `TRINITY_CLIENT_DIR` 覆盖；`--no-client` 只起服务端。
 
-`docker-compose.yml` 固定项目名 `trinity`，所有 checkout 共用同一组容器，所以从 worktree 运行会用该 worktree 的代码重建 `trinity-server`；日常仍在主工作区 `M:\EVE-LOCAL\trinity` 运行。等 26000 就绪后手动启动 `M:\EVE-LOCAL\inputs\EVE-Online-45017\eve.exe`。
+- 不经过 `eve.exe` 引导器：45017 的 `eve.exe` 是 bootstrapper（PE 里声明 `<GameExecutable path="bin\ExeFile.exe" />`），可能做更新检查；本地固定 45017，直接启动游戏进程 `bin\ExeFile.exe`。
+- `/server:` 与 `/port:` 是零售客户端自带参数：`EVE-Online-45017-code\tree\ui\login\loginII.py:145-156` 用它们覆盖 `boot.ini` 的 `server`/`port`。`boot.ini` 当前是 `server=Tranquility`、`port=26000`；`Tranquility` 在 `loginII.py:35-55` 解析成官方 `87.237.38.200`，所以本地必须传 `/server:127.0.0.1`。
+- 45017 的登录界面没有 3913 的 `USERDOMAIN=CENTRAL` 隐藏服务器列表，`Play.bat` 不设该变量；本地入口由 `/server:127.0.0.1` 直接指定。
+
+先决条件：端口 26000/8080/5432 未被占用（EveJS / redmoonrising 等服务若在跑，先停对应容器）。
+
+`docker-compose.yml` 固定项目名 `trinity`，所有 checkout 共用同一组容器，所以从 worktree 运行会用该 worktree 的代码重建 `trinity-server`；日常仍在主工作区 `M:\EVE-LOCAL\trinity` 运行。
 
 ## 本地构建（不走 Docker）
 

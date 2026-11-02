@@ -17,6 +17,20 @@
 
 固定不升级；补丁只针对这一构建。
 
+## 启动与登录
+
+- `eve.exe` 是 bootstrapper（PE 里声明 `<GameExecutable path="bin\ExeFile.exe" />`），
+  真正的游戏进程是 `bin\ExeFile.exe`；本地固定 45017，仓库根 `Play.bat` 直接启动后者，
+  绕过引导器的更新检查。
+- 登录地址来自 `boot.ini` 的 `server`/`port`，但零售代码支持命令行覆盖：
+  `tree/ui/login/loginII.py:145-156` 解析 `/server:<name|ip>` 与 `/port:<n>`。
+  `boot.ini` 当前是 `server=Tranquility`、`port=26000`，`Tranquility` 在
+  `loginII.py:35-55` 解析成官方 `87.237.38.200`，所以连本地要传
+  `/server:127.0.0.1 /port:26000`。
+- 45017 没有 3913 的 `USERDOMAIN=CENTRAL` 隐藏服务器列表；登录界面显示哪个服务器由
+  `boot.ini`/prefs 的 `server` 或 `/server:` 参数决定，`Play.bat` 传 `127.0.0.1`
+  即显示本地服务器。
+
 ## 代码基线
 
 | 来源 | 大小 | sha256 | 模块数 |
