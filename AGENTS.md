@@ -145,7 +145,11 @@ git 对分支引用加锁、更新原子，**不存在真正的同时合并**：
 - 客户端代码仓库采用与 3913 相同的双分支策略：`main` = 零售基线（只对照与重置），`plus` = 开发主线；每个任务用独立 worktree 与 `Local patch: <英文简述>` 提交。
 - 已落地基线：`dist/compiled.code`（436 模块）+ `dist/lib.ccp`（23）+ `dist/stdlib.ccp`（226），共 685 个模块；`tree/`、`lib/`、`stdlib/` 下是 `.pyc`（权威）+ `.py`（uncompyle6 阅读稿）。基线提交 `b74ecc1`，`plus` 已建。
 - 45017 的容器格式：`script/compiled.code` 是 protocol-2 pickle 的分区字典；`lib/*.ccp` 是 ZIP + `.pyj`。两类载荷都是 **RC4(zlib(...))**：`compiled.code` 内层是 marshal code object，`.pyj` 内层是 8 字节 pyc 头 + marshal；RC4 16 字节密钥在 `bin/blue.dll` 的 SIMPLEBLOB 里（`blob[12:28]` 反转）。
-- 工具：`tools/extract_compiled_code.py`（解包/反编译/manifest）、`tools/verify_manifest.py`（校验）。**重打包/签名工具尚未实现**；在它落地前，不要声称已能改写并回写 `compiled.code`。
+- 工具（客户端仓库 `tools/`）：`extract_compiled_code.py`（解包/反编译/manifest）、`verify_manifest.py`（校验）、
+  `marshal25.py`（2.5 marshal 读写）、`bytecode25.py`（16 位操作数字节码）、`build_compiled_code.py`
+  （重新打包 `compiled.code`）、`build_ccp.py`（重建 `.ccp`）、`patch_verify_gate.py`（跳过 `compiled.code`
+  签名校验）、`patch_blue_dll.py`（Placebo 登录的 manifest 单文件校验补丁）。
+  重打包已实跑验证；细节以客户端仓库 `README.md` 为准。
 - 改动流程（重打包工具就绪后）：备份当前代码包 → 从零售基线重新生成 → 脚本改写并校验 → 覆盖客户端代码包 → **完全退出并重启客户端** → 记录到 `doc/client/`。
 - 只改显示文本/本地化；类名、字典键、import 名、比较常量、单 token 标识符不改。`bin\ExeFile.exe`、`bin\*.dll`、`res\*.stuff` 一律不改。
 - 不得混用 3913 的 `compiled.code` 工具或现代客户端（3396210）的 `.fsdbinary`/`code.ccp` 经验。

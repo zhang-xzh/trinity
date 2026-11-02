@@ -88,10 +88,21 @@
 
 - `main` = 零售基线；`plus` = 开发主线；任务分支 `<前缀>/<功能>-<sessionid>`，独立 worktree。
 - 远程 `gogs` = `http://10.10.10.1:3001/zhangxzh/EVE-Online-45017-code.git`（已配置，尚未推送）。
-- **重打包/签名工具尚未实现**。当前只做解包、阅读与脚本/文档改动；在重打包落地前，
-  不要声称已能把修改回写 `script\compiled.code`。
-- 重打包落地后的流程：从零售基线重新生成 → 校验 → 覆盖客户端代码包（先备份）→
-  **完全退出并重启客户端** → 证据看 `capture\Gamelogs`。
+- **重打包已落地**（客户端仓库 `plus`，无需 CCP 私钥）：
+  `tools/marshal25.py`（Python 2.5 marshal 读写，685 个载荷逐字节回环）、
+  `tools/bytecode25.py`（客户端 **16 位操作数**字节码：`opcode >= 90` 占 3 字节）、
+  `tools/build_compiled_code.py`（436 个模块重新 RC4+zlib，`enc` 与零售逐字节相同；
+  容器因 cPickle memo 少 5 字节、结构等价）、
+  `tools/build_ccp.py`（未修改时与零售 `.ccp` 逐字节相同）、
+  `tools/patch_verify_gate.py`（把 `lib/nasty.py` 的 `Compilor.VerifyDataSignature`
+  改成返回 `self`，同长度、不移动偏移）。
+- 签名校验：`Compilor.Load()` 只在 `blue.pyos.packaged` 为真或命令行带
+  `/VerifyCodeSignature` 时校验 `compiled.code` 的 RSA 签名；零售客户端为 packaged
+  （实测把签名翻转 1 字节后只出 Console、没有 `triuiScreen` 的 `EVE` 窗口）。
+  `bin/blue.dll` 不导出 `CryptSignHash`，本地无法重签；但 `lib.ccp` 不签名、启动不校验，
+  改 `VerifyDataSignature` 即可放行（实测与重打包的 `compiled.code` 一起能进登录界面）。
+- 流程：改 `tree/*.pyc` 的显示文本 → 重打包 `compiled.code` 与 `lib.ccp`（先备份）→
+  **完全退出并重启客户端** → 证据看 `capture\Gamelogs` 与登录界面。
 - 只改显示文本/本地化；不改类名、字典键、import 名、比较常量、单 token 标识符。
   代码包改写不动 `bin\ExeFile.exe`、`bin\*.dll`、`res*.stuff`；唯一例外是上面
   「加密包与本地登录补丁」的 `bin\blue.dll` Placebo 补丁（固定偏移、有备份与回滚）。
