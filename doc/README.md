@@ -9,7 +9,7 @@
 | [`setup/`](setup/) | 运行、构建、配置、启动、agent 规则迁移记录 | [`setup/server-operations.md`](setup/server-operations.md)、[`setup/agent-rules.md`](setup/agent-rules.md) |
 | [`platform/`](platform/) | 架构：crate 划分、连接/服务/世界状态、ballpark、bots、web | [`platform/architecture.md`](platform/architecture.md) |
 | [`data/`](data/) | PostgreSQL 表转储、卷、备份/重置、版本溯源 | [`data/database.md`](data/database.md) |
-| [`client/`](client/) | 45017 客户端目录、代码仓库、本地化（客户端就绪后补全） | [`client/client-45017.md`](client/client-45017.md) |
+| [`client/`](client/) | 45017 客户端目录、代码仓库、本地化；3913/45017/3396210 三代谱系 | [`client/client-45017.md`](client/client-45017.md)、[`client/version-lineage-3913-45017-3396210.md`](client/version-lineage-3913-45017-3396210.md) |
 | [`issues/`](issues/) | 已解决异常归档（一篇一异常 + 索引） | [`issues/INDEX.md`](issues/INDEX.md) |
 
 后续出现新领域（如 `gameplay/`、`market/`、`history/`）时按需建目录，并同时更新本文件与 `knowledge-inventory.md`。

@@ -5,8 +5,8 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 ## 环境事实
 
 - 服务端：`M:\EVE-LOCAL\trinity`（Rust workspace；镜像/容器 `trinity-server`，Postgres 容器 `trinity-postgres`；端口 26000 / 8080 / 5432）。
-- 客户端：`M:\EVE-LOCAL\inputs\EVE-Online-45017`（EVE Trinity 4.10 / build 45017，`eve.exe`，永不升级）。**客户端尚未实际就绪，路径按约定预留。**
-- 客户端代码仓库：`M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（独立 git 仓库；尚未就绪）。
+- 客户端：`M:\EVE-LOCAL\inputs\EVE-Online-45017`（EVE Trinity 4.10 / build 45017，`eve.exe`，永不升级）。客户端目录已就位（`bin\ExeFile.exe`、`script\compiled.code`、`res*.stuff`），容器格式见 `doc/client/version-lineage-3913-45017-3396210.md`。
+- 客户端代码仓库：`M:\EVE-LOCAL\inputs\EVE-Online-45017-code`（独立 git 仓库；目录尚未创建）。
 - 启动：当前没有 `Play.bat`；`docker compose up -d` 起服务端，客户端就绪后手动启动 `eve.exe`。
 - 远端：`origin` = `github.com/zhang-xzh/trinity`；当前只有长期分支 `main`（没有 `plus`/上游基线双分支）。
 - 数据库：PostgreSQL 16，命名卷 `trinity_pgdata`（compose 项目名 `trinity`），初始化数据 `db/*.sql.gz`（228 个表转储）。
@@ -41,6 +41,7 @@ Trinity 项目的知识索引：技能（skills）、仓库文档、脚本与工
 | `doc/platform/architecture.md` | 服务端架构总览（crate、模块、数据流） |
 | `doc/data/database.md` | 数据库结构、初始化、备份、重置 |
 | `doc/client/client-45017.md` | 45017 客户端与代码仓库的约定路径、待核对项、改写边界 |
+| `doc/client/version-lineage-3913-45017-3396210.md` | 3913/45017/3396210 三代客户端技术对比与 45017 的中间态定位 |
 | `doc/issues/INDEX.md` | 异常归档索引 |
 
 ## 脚本与工具
