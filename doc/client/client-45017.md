@@ -1,6 +1,6 @@
 # 45017 客户端与代码仓库
 
-> 客户端与客户端代码仓库尚未实际就绪。本文先记录约定路径、待核对项与改写边界；就绪后按实际内容补全，并把核对结果同步到 `AGENTS.md` 与 skill `trinity-client-code`。
+> 状态：客户端目录已就位（`bin\ExeFile.exe`、`script\compiled.code`、`res*.stuff`）；代码仓库目录 `EVE-Online-45017-code` 尚未创建。客户端容器格式与三代谱系见 `doc/client/version-lineage-3913-45017-3396210.md`；本文保留约定路径、待核对项与改写边界。
 
 ## 约定路径
 
